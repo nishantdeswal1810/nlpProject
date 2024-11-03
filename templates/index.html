@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLP Project - Team Dashboard</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Styles -->
+    <style>
+        .bg-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #363636 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #4F46E5;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Infinite scroll container */
+        .infinite-scroll-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scroll-content {
+            display: flex;
+            animation: scroll 20s linear infinite;
+            /* Pausing animation on hover to allow normal scrolling */
+            animation-play-state: running;
+        }
+
+        .infinite-scroll-container:hover .scroll-content {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                /* This should be adjusted based on the total width of your cards */
+                transform: translateX(-100%);
+            }
+        }
+
+        /* Custom scrollbar styles for hover state */
+        .infinite-scroll-container:hover {
+            overflow-x: auto;
+        }
+
+        .infinite-scroll-container:hover::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .infinite-scroll-container:hover::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .infinite-scroll-container:hover::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .infinite-scroll-container:hover::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Mobile menu animation */
+        .mobile-menu {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .mobile-menu.hidden {
+            transform: translateX(-100%);
+        }
+    </style>
+</head>
+<body class="bg-gradient min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="bg-black/30 backdrop-blur-md w-full">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <img src="https://iiitl.ac.in/wp-content/uploads/2019/10/Final_Logo_IIITL.png" 
+                         alt="IIITL Logo" 
+                         class="h-12 w-auto mr-4">
+                    <div class="text-xl font-bold">NLP Project</div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="{{ url_for('home') }}" class="nav-link hover:text-indigo-400">Home</a>
+                    <a href="{{ url_for('dashboard') }}" class="nav-link hover:text-indigo-400">Dashboard</a>
+                    <a href="{{ url_for('cve') }}" class="nav-link hover:text-indigo-400">CVE</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-16 6h16"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div id="mobileMenu" class="mobile-menu hidden md:hidden mt-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="{{ url_for('home') }}" class="nav-link hover:text-indigo-400">Home</a>
+                    <a href="{{ url_for('dashboard') }}" class="nav-link hover:text-indigo-400">Dashboard</a>
+                    <a href="{{ url_for('cve') }}" class="nav-link hover:text-indigo-400">CVE</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 pt-8">
+        <!-- Professor Section -->
+        <section class="text-center mb-20">
+            <div class="relative inline-block">
+                <img src="{{ url_for('static', filename='images/professor.jpg') }}" 
+                     alt="Prof. Gaurav Sharma" 
+                     class="w-48 h-48 rounded-full object-cover border-4 border-indigo-500 mb-4">
+                <div class="absolute -bottom-2 -right-2 bg-indigo-500 rounded-full p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.04 8.61a3.5 3.5 0 00-4.95-4.95L8.5 9.25l4.95 4.95a3.5 3.5 0 004.95-4.95l-4.95-4.95z"/>
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold mb-2">Prof. Gaurav Sharma</h1>
+            <p class="text-gray-300">Project Guide - Natural Language Processing</p>
+        </section>
+
+        <!-- Team Members Section -->
+        <section class="mb-20">
+            <h2 class="text-2xl font-bold mb-8 text-center">Our Team</h2>
+            <!-- Infinite scroll container -->
+            <div class="infinite-scroll-container">
+                <div class="scroll-content">
+                    <!-- Team Member Cards -->
+                    {% set team_members = [
+                        {'name': 'Mukul', 'role': 'Model Finetuning', 'image': 'mukul.jpg'},
+                        {'name': 'Manaswani', 'role': 'Model Finetuning', 'image': 'manaswani.jpg'},
+                        {'name': 'Nishant', 'role': 'Database and Webapp Development', 'image': 'nishant.jpg'},
+                        {'name': 'Shubi', 'role': 'Data Cleaning', 'image': 'shubi.jpg'},
+                        {'name': 'Nikhil', 'role': 'Data Extraction', 'image': 'nikhil.jpg'}
+                    ] %}
+                    
+                    <!-- Original set of cards -->
+                    {% for member in team_members %}
+                    <div class="flex-none w-72 px-3">
+                        <!-- Card height is set to h-96 (384px). Modify this value as needed -->
+                        <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 card-hover h-96">
+                            <img src="{{ url_for('static', filename='images/' + member.image) }}" 
+                                 alt="{{ member.name }}"
+                                 class="w-32 h-32 rounded-full mx-auto object-cover mb-4">
+                            <h3 class="text-xl font-semibold text-center mb-2">{{ member.name }}</h3>
+                            <p class="text-gray-300 text-center">{{ member.role }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Duplicate set for seamless infinite scroll -->
+                    {% for member in team_members %}
+                    <div class="flex-none w-72 px-3">
+                        <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 card-hover h-96">
+                            <img src="{{ url_for('static', filename='images/' + member.image) }}" 
+                                 alt="{{ member.name }}"
+                                 class="w-32 h-32 rounded-full mx-auto object-cover mb-4">
+                            <h3 class="text-xl font-semibold text-center mb-2">{{ member.name }}</h3>
+                            <p class="text-gray-300 text-center">{{ member.role }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Overview -->
+        <section class="mb-20">
+            <div class="bg-white/5 backdrop-blur-lg rounded-xl p-8">
+                <h2 class="text-2xl font-bold mb-6">Project Overview</h2>
+                <p class="text-gray-300 leading-relaxed">
+                    Our NLP project focuses on advanced natural language processing techniques,
+                    combining model finetuning, robust database management, and efficient data
+                    processing to deliver innovative solutions in the field of text analysis.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript for mobile menu toggle and card adjustments -->
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuButton = document.querySelector('button.md:hidden');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Card height adjustment on load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Cards loaded - adjust height as needed');
+        });
+    </script>
+</body>
+</html>
