@@ -1,3 +1,7 @@
 flask
 flask_cors
 ijson
+pymongo
+pandas
+plotly
+python_dotenv
