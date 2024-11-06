@@ -5,3 +5,5 @@ pandas
 plotly
 python_dotenv
 gunicorn
+langchain
+langchain_groq

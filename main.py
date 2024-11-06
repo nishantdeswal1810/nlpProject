@@ -7,6 +7,8 @@ import pandas as pd
 import plotly
 import json
 from datetime import datetime
+from langchain_groq import ChatGroq
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -17,12 +19,65 @@ app.config['SECRET_KEY'] = 'your-secret-key-here'
 # Load environment variables
 load_dotenv()
 MONGODB_URI = os.getenv('MONGODB_URI')
+GROQ_API_KEY= os.getenv('GROQ_API_KEY')
 
 # MongoDB client and collections
 client = MongoClient(MONGODB_URI)
 db = client['nlp']
 collection = db['cve']
+cve_collection=db['cve']
 kpi_collection = db['kpi_cache']
+
+# Defining LLM
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    temperature=0,
+    max_tokens=None,
+    timeout=None,
+    max_retries=2,
+)
+
+def summarize_cve_id(cve_id):
+    print(f"Received CVE ID: {cve_id}")
+    query = {"id": cve_id}
+    result = cve_collection.find(query)
+    result_data = list(result)
+    if result_data:
+        processed_data = {
+            key: (value if key != '_id' else None) for key, value in result_data[0].items()
+            if key != '_id'
+        }
+        print(f"Processed Data: {processed_data}")
+
+        refs = processed_data['references']
+        corrected_refs = []
+        for ref in refs:
+            url_pattern = r'([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/[^\s\'"]*)?'
+            url_match = re.search(url_pattern, ref)
+            corrected_refs.append(url_match.group(0))
+        processed_data['references'] = corrected_refs
+        prompt = str(processed_data)
+        messages = [
+            ("system", """You are an assistant who reads the data related to CVE ID, provides the detail of the description of CVE_ID and some other points like impact, exploitability and you need to find a patch if there is an update or patch is there"""),
+            ("human", prompt),
+        ]
+        ai_msg = llm.invoke(messages)
+        print(f"LLM Response: {ai_msg.content}")
+        processed_data['LLM_Response'] = ai_msg.content
+        return jsonify(processed_data)
+    else:
+        return None
+    
+@app.route('/cve', methods=['GET', 'POST'])
+def cve():
+    if request.method == 'POST':
+        cve_id = request.form['cve_id']
+        cve_data = summarize_cve_id(cve_id)
+        if cve_data:
+            return render_template('cve.html', cve_data=cve_data)
+        else:
+            return render_template('404.html'), 404
+    return render_template('cve.html')
 
 # Function to calculate and cache KPIs
 def calculate_kpis():
@@ -89,10 +144,10 @@ def refresh_kpis():
     return jsonify(kpis)
 
 
-@app.route('/cve')
-def cve():
-    # This route will be implemented later
-    return "CVE page coming soon!"
+# @app.route('/cve')
+# def cve():
+#     # This route will be implemented later
+#     return "CVE page coming soon!"
 
 # Error handlers
 @app.errorhandler(404)

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVE Details - NLP Project</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Styles -->
+    <style>
+        .bg-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #363636 100%);
+        }
+    </style>
+</head>
+<body class="bg-gradient min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="bg-black/30 backdrop-blur-md w-full">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="IIITL Logo" class="h-12 w-auto mr-4">
+                    <div class="text-xl font-bold">NLP Project</div>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="{{ url_for('home') }}" class="hover:text-indigo-400">Home</a>
+                    <a href="{{ url_for('dashboard') }}" class="hover:text-indigo-400">Dashboard</a>
+                    <a href="{{ url_for('cve') }}" class="text-indigo-400 font-medium">CVE</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-16 6h16" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div id="mobileMenu" class="mobile-menu hidden md:hidden mt-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="{{ url_for('home') }}" class="hover:text-indigo-400">Home</a>
+                    <a href="{{ url_for('dashboard') }}" class="hover:text-indigo-400">Dashboard</a>
+                    <a href="{{ url_for('cve') }}" class="text-indigo-400 font-medium">CVE</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <div class="bg-white/5 backdrop-blur-lg rounded-xl p-8">
+            <h1 class="text-2xl font-bold mb-6">CVE Details</h1>
+            {% if cve_data %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h2 class="text-xl font-bold mb-2">CVE ID</h2>
+                    <p class="text-gray-300">{{ cve_data.id }}</p>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold mb-2">CVSS Score</h2>
+                    <p class="text-gray-300">{{ cve_data.cvssScore }}</p>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold mb-2">Published Date</h2>
+                    <p class="text-gray-300">{{ cve_data.publishedDate }}</p>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold mb-2">Confidentiality Impact</h2>
+                    <p class="text-gray-300">{{ cve_data.confidentialityImpact }}</p>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold mb-2">Integrity Impact</h2>
+                    <p class="text-gray-300">{{ cve_data.integrityImpact }}</p>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold mb-2">Availability Impact</h2>
+                    <p class="text-gray-300">{{ cve_data.availabilityImpact }}</p>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h2 class="text-xl font-bold mb-2">Description</h2>
+                <p class="text-gray-300">{{ cve_data.description }}</p>
+            </div>
+
+            <div class="mt-8">
+                <h2 class="text-xl font-bold mb-2">References</h2>
+                <ul class="list-disc pl-6 text-gray-300">
+                    {% for ref in cve_data.references %}
+                    <li><a href="{{ ref }}" target="_blank" class="hover:text-indigo-400">{{ ref }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="mt-8">
+                <h2 class="text-xl font-bold mb-2">LLM Response</h2>
+                <p class="text-gray-300">{{ cve_data.llm_response }}</p>
+            </div>
+            {% else %}
+            <form method="post" class="flex justify-center">
+                <input type="text" name="cve_id" placeholder="Enter CVE ID" class="bg-white/10 backdrop-blur-lg rounded-l-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 mr-2" />
+                <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 rounded-r-xl px-4 py-2 text-white font-medium">
+                    Submit
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- JavaScript for mobile menu toggle -->
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuButton = document.querySelector('button.md:hidden');
+            if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
