@@ -24,6 +24,10 @@ This NLP project is built to streamline the extraction, analysis, and accessibil
 6. **Search and Analysis**: Users can search for CVEs by ID, view detailed information, and analyze key metrics.
 7. **NLP Model Integration**: Utilized GROQ with LLaMA 3.1 8B model to support natural language responses based on CVE data.
 
+
+![image](https://github.com/user-attachments/assets/9bbf382a-ab25-4798-8739-3da7cab88610)
+
+
 ## Technologies Used
 - **Backend**: Flask
 - **Database**: MongoDB Atlas
@@ -34,9 +38,9 @@ This NLP project is built to streamline the extraction, analysis, and accessibil
 ## Getting Started
 
 ### Prerequisites
-- Python 3.7+
+- Python 3.12 used
 - MongoDB Atlas account
-- API keys for data sources (if applicable)
+- API keys for data sources (contact us for data)
 
 ### Installation
 1. **Clone the repository**:
