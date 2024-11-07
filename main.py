@@ -54,20 +54,31 @@ def summarize_cve_id(cve_id):
         for ref in refs:
             url_pattern = r'([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/[^\s\'"]*)?'
             url_match = re.search(url_pattern, ref)
-            corrected_refs.append(url_match.group(0))
+            
+            if url_match:
+                corrected_refs.append(url_match.group(0))
         processed_data['references'] = corrected_refs
+        
         prompt = str(processed_data)
         messages = [
             ("system", """You are an assistant who reads the data related to CVE ID, provides the detail of the description of CVE_ID and some other points like impact, exploitability and you need to find a patch if there is an update or patch is there"""),
             ("human", prompt),
         ]
-        ai_msg = llm.invoke(messages)
-        print(f"LLM Response: {ai_msg.content}")
-        processed_data['LLM_Response'] = ai_msg.content
-        return jsonify(processed_data)
-    else:
-        return None
+
+        try:
+            ai_msg = llm.invoke(messages)
+            print(f"LLM Response: {ai_msg.content}")
+            processed_data['LLM_Response'] = ai_msg.content
+            return processed_data
     
+        except Exception as e:
+            print(f"Error with LLM invocation: {e}")
+            return jsonify({"error": "Failed to retrieve LLM response"}), 500
+  
+    else:
+        print("No data found for the given CVE ID")  # Debug: No data found
+        return None
+
 @app.route('/cve', methods=['GET', 'POST'])
 def cve():
     if request.method == 'POST':
