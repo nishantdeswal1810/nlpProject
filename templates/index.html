@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='images/search.png') }}" type="image/png">
     <title>NLP Project - Team Dashboard</title>
+
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Custom Styles -->
@@ -160,12 +162,13 @@
                 <div class="scroll-content">
                     <!-- Team Member Cards -->
                     {% set team_members = [
-                        {'name': 'Mukul', 'role': 'Model Finetuning', 'image': 'mukul.jpg'},
-                        {'name': 'Manaswini', 'role': 'Model Finetuning', 'image': 'manaswini.jpg'},
-                        {'name': 'Nishant', 'role': 'Database and Webapp Development', 'image': 'nishant.jpg'},
-                        {'name': 'Subhi', 'role': 'Data Cleaning', 'image': 'subhi.jpg'},
-                        {'name': 'Nikhil', 'role': 'Data Extraction', 'image': 'nikhil.jpg'}
+                        {'name': 'Mukul', 'role': 'Model Optimization & Fine-Tuning', 'image': 'mukul.jpg'},
+                        {'name': 'Manaswini', 'role': 'Model Training & Performance Enhancement', 'image': 'manaswini.jpg'},
+                        {'name': 'Nishant', 'role': 'Backend Development & Database Management', 'image': 'nishant.jpg'},
+                        {'name': 'Subhi', 'role': 'Data Preprocessing & Cleaning', 'image': 'subhi.jpg'},
+                        {'name': 'Nikhil', 'role': 'Data Collection & Extraction', 'image': 'nikhil.jpg'}
                     ] %}
+
                     
                     <!-- Original set of cards -->
                     {% for member in team_members %}
@@ -198,13 +201,24 @@
         </section>
 
         <!-- Project Overview -->
+        <!-- Project Overview -->
         <section class="mb-20">
             <div class="bg-white/5 backdrop-blur-lg rounded-xl p-8">
                 <h2 class="text-2xl font-bold mb-6">Project Overview</h2>
                 <p class="text-gray-300 leading-relaxed">
-                    Our NLP project focuses on advanced natural language processing techniques,
-                    combining model finetuning, robust database management, and efficient data
-                    processing to deliver innovative solutions in the field of text analysis.
+                    Our NLP project is designed to automate the extraction of key information from CVE (Common Vulnerabilities and Exposures) entries and provide accessible insights for further analysis and integration into security systems. The project follows a structured methodology involving data extraction, cleaning, and advanced model utilization.
+                </p>
+                <ul class="list-disc pl-6 text-gray-300 mt-4">
+                    <li><strong>Data Extraction:</strong> Collected CVE data using scraping and available APIs.</li>
+                    <li><strong>Data Cleaning:</strong> Preprocessed and cleaned the extracted data for consistency.</li>
+                    <li><strong>Storage:</strong> Stored the processed data in a MongoDB Atlas database for easy access and management.</li>
+                    <li><strong>Web Application:</strong> Built a Flask-based website featuring a user-friendly dashboard and CVE analysis tools.</li>
+                    <li><strong>Visualization:</strong> Integrated Plotly for interactive and insightful data visualizations in the dashboard.</li>
+                    <li><strong>Search Functionality:</strong> Implemented a feature for users to search for specific CVE IDs and view comprehensive information from the database.</li>
+                    <li><strong>NLP Inference:</strong> Utilized GROQ with an open-source LLaMA 3.1 8B model for advanced language understanding and response generation.</li>
+                </ul>
+                <p class="text-gray-300 mt-4">
+                    This project demonstrates the effective use of NLP techniques, data management, and user interface development to provide an efficient system for security data analysis and access.
                 </p>
             </div>
         </section>
