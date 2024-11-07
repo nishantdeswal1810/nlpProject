@@ -7,3 +7,4 @@ python_dotenv
 gunicorn
 langchain
 langchain_groq
+markdown2

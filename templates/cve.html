@@ -20,7 +20,9 @@
             <div class="flex items-center justify-between">
                 <!-- Logo and Brand -->
                 <div class="flex items-center">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="IIITL Logo" class="h-12 w-auto mr-4">
+                    <img src="https://iiitl.ac.in/wp-content/uploads/2019/10/Final_Logo_IIITL.png" 
+                         alt="IIITL Logo" 
+                         class="h-12 w-auto mr-4">
                     <div class="text-xl font-bold">NLP Project</div>
                 </div>
 
@@ -99,9 +101,11 @@
                 </ul>
             </div>
 
+            <hr class="border-gray-600 mb-4"> <!-- Horizontal line divider -->
+
             <div class="mt-8">
                 <h2 class="text-xl font-bold mb-2">LLM Response</h2>
-                <p class="text-gray-300">{{ cve_data.LLM_Response }}</p>
+                <div class="text-gray-300" style="white-space: pre-wrap;">{{ cve_data.LLM_Response | safe }}</div>
             </div>
             {% else %}
             <form method="post" class="flex justify-center">

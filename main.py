@@ -9,6 +9,7 @@ import json
 from datetime import datetime
 from langchain_groq import ChatGroq
 import re
+import markdown2
 
 app = Flask(__name__)
 CORS(app)
@@ -68,7 +69,7 @@ def summarize_cve_id(cve_id):
         try:
             ai_msg = llm.invoke(messages)
             print(f"LLM Response: {ai_msg.content}")
-            processed_data['LLM_Response'] = ai_msg.content
+            processed_data['LLM_Response'] = markdown2.markdown(ai_msg.content)
             return processed_data
     
         except Exception as e:
