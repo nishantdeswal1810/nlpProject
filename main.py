@@ -10,6 +10,7 @@ from datetime import datetime
 from langchain_groq import ChatGroq
 import re
 import markdown2
+from similarity import *
 
 app = Flask(__name__)
 CORS(app)
@@ -123,6 +124,31 @@ def load_kpis():
         kpi_data.pop('_id', None)  # Remove MongoDB-specific _id field
     return kpi_data
 
+@app.route('/similar-search')
+def similar_search():
+    return render_template('search.html')
+
+@app.route('/api/search', methods=['POST'])
+def similarity_search():
+    try:
+        data = request.get_json()
+        if not data or 'query' not in data:
+            return jsonify({'error': 'No query provided'}), 400
+            
+        query = data['query']
+        top_k = data.get('top_k', 5)
+        
+        # Get search engine instance
+        search_engine = get_search_engine()
+        
+        # Perform search
+        results = search_engine.search(query, top_k)
+        
+        return jsonify({'results': results})
+        
+    except Exception as e:
+        print(f"Search error: {str(e)}")  # For debugging
+        return jsonify({'error': 'Search failed. Please try again.'}), 500
 
 @app.route('/')
 @app.route('/home')
