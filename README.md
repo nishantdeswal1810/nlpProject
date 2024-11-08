@@ -2,6 +2,7 @@
 # NLP Project for CVE Data Analysis
 
 **Deployed at:** [https://nlpproject-pl6e.onrender.com/](https://nlpproject-pl6e.onrender.com/)
+**Demo at:** [Video Demo](https://drive.google.com/file/d/1oFGXaLMhgJY7y8OKO4hEWjZIrAAFM5Ly/view?usp=drive_link)
 
 ## Project Overview
 This NLP project is built to streamline the extraction, analysis, and accessibility of critical information from CVE (Common Vulnerabilities and Exposures) entries. By employing advanced NLP models and interactive visualizations, this project enables users to gain deep insights into security vulnerabilities and seamlessly integrate the data into security workflows.
