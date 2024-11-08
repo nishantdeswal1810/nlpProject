@@ -24,8 +24,8 @@ This NLP project is built to streamline the extraction, analysis, and accessibil
 6. **Search and Analysis**: Users can search for CVEs by ID, view detailed information, and analyze key metrics.
 7. **NLP Model Integration**: Utilized GROQ with LLaMA 3.1 8B model to support natural language responses based on CVE data.
 
+![image](https://github.com/user-attachments/assets/d9f8d8fb-9277-420a-ad6a-6b925d360f54)
 
-![image](https://github.com/user-attachments/assets/9bbf382a-ab25-4798-8739-3da7cab88610)
 
 
 ## Technologies Used
