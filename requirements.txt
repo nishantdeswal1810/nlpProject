@@ -8,3 +8,6 @@ gunicorn
 langchain
 langchain_groq
 markdown2
+torch
+transformers
+pinecone

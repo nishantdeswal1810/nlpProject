@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='images/search.png') }}" type="image/png">
+    <title>Similar CVE Search - NLP Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #363636 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient min-h-screen text-white">
+    <!-- Navigation (keep your existing navigation) -->
+    <nav class="bg-black/30 backdrop-blur-md w-full">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <img src="https://iiitl.ac.in/wp-content/uploads/2019/10/Final_Logo_IIITL.png" 
+                         alt="IIITL Logo" 
+                         class="h-12 w-auto mr-4">
+                    <div class="text-xl font-bold">NLP Project Dashboard</div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="{{ url_for('home') }}" class="nav-link hover:text-indigo-400">Home</a>
+                    <a href="{{ url_for('dashboard') }}" class="nav-link hover:text-indigo-400">Dashboard</a>
+                    <a href="{{ url_for('cve') }}" class="nav-link hover:text-indigo-400">CVE</a>
+                    <a href="{{ url_for('similar_search') }}" class="nav-link hover:text-indigo-400">Similar Search</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-16 6h16"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div id="mobileMenu" class="mobile-menu hidden md:hidden mt-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="{{ url_for('home') }}" class="nav-link hover:text-indigo-400">Home</a>
+                    <a href="{{ url_for('dashboard') }}" class="nav-link hover:text-indigo-400">Dashboard</a>
+                    <a href="{{ url_for('cve') }}" class="nav-link hover:text-indigo-400">CVE</a>
+                    <a href="{{ url_for('similar_search') }}" class="nav-link hover:text-indigo-400">Similar Search</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <section class="max-w-4xl mx-auto">
+            <div class="bg-white/5 backdrop-blur-lg rounded-xl p-8 mb-8">
+                <h1 class="text-3xl font-bold mb-6">Similar CVE Search</h1>
+                <p class="text-gray-300 mb-6">
+                    Search for similar CVE entries using natural language description.
+                </p>
+                
+                <form id="searchForm" class="space-y-4">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input 
+                            type="text" 
+                            id="searchQuery"
+                            placeholder="Describe the vulnerability you're looking for..."
+                            class="flex-1 px-4 py-3 bg-white/10 rounded-lg border border-gray-600 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 text-white placeholder-gray-400"
+                            required
+                        >
+                        <button 
+                            type="submit"
+                            class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                        >
+                            Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="hidden space-y-6">
+                <h2 class="text-2xl font-bold mb-4">Search Results</h2>
+                <div id="resultsList" class="space-y-4">
+                    <!-- Results will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="hidden">
+                <div class="flex items-center justify-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="hidden bg-red-500/20 border border-red-500 text-red-100 px-4 py-3 rounded-lg">
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const query = document.getElementById('searchQuery').value.trim();
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsList = document.getElementById('resultsList');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Reset UI
+            errorMessage.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+            loadingIndicator.classList.remove('hidden');
+            
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        top_k: 5
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) throw new Error(data.error || 'Search failed');
+                
+                // Clear previous results
+                resultsList.innerHTML = '';
+                
+                // Add new results
+                data.results.forEach(result => {
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'bg-white/10 backdrop-blur-lg rounded-xl p-6 card-hover';
+                    resultCard.innerHTML = `
+                        <h3 class="text-xl font-semibold mb-2">${result.cve_id}</h3>
+                        <p class="text-gray-300 mb-4">${result.description}</p>
+                        <div class="text-sm text-gray-400">
+                            Similarity Score: ${(result.similarity_score * 100).toFixed(2)}%
+                        </div>
+                    `;
+                    resultsList.appendChild(resultCard);
+                });
+                
+                resultsSection.classList.remove('hidden');
+                
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                errorMessage.classList.remove('hidden');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
